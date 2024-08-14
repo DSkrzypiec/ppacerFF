@@ -1,0 +1,87 @@
+{{ block "index" . }}
+<DOCTYPE html>
+<html lang="en">
+    {{ template "header" . }}
+    {{ template "body" . }}
+</html>
+{{ end }}
+
+{{ block "body" . }}
+    <body data-theme="sunset" class="min-h-screen bg-base-200">
+        <div class="container mx-auto p-6">
+            {{ template "intro" }}
+            {{ if .ShowForm }}
+                {{ template "form" . }}
+            {{ end }}
+            {{ template "notifications" . }}
+            <div class="flex justify-center items-center mt-4">
+                <span id="form-loader" class="htmx-indicator loading loading-bars loading-md"></span>
+            </div>
+        </div>
+    </body>
+{{ end }}
+
+
+{{ block "form" . }}
+<div class="p-8 rounded-lg shadow-md max-w-md mx-auto">
+    <form hx-post="/register" hx-target="#post-reg-notifications" hx-indicator="#form-loader">
+        <div class="mb-4">
+            <label for="nickname" class="block text-sm font-medium text-gray-700">Nickname (optional)</label>
+            <input type="text" id="nickname" name="nickname" class="input input-bordered w-full mt-1" placeholder="Your nickname">
+        </div>
+        <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="email" name="email" required class="input input-bordered w-full mt-1" placeholder="Your email address">
+        </div>
+        <div class="mb-4">
+            <label class="inline-flex items-center">
+                <input type="checkbox" class="checkbox checkbox-primary" required>
+                <span class="ml-2">I agree to the <a href="#" class="text-primary">GDPR terms and conditions</a></span>
+            </label>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary w-full">Register</button>
+        </div>
+    </form>
+</div>
+{{ end }}
+
+{{ block "notifications" . }}
+    <div id="post-reg-notifications">
+        {{ if .PostRegisterInfo }}
+            <div class='alert alert-success'>{{ .PostRegisterInfo }}</div>
+        {{ end }}
+        {{ if .PostRegisterError }}
+            <div class='alert alert-error'>{{ .PostRegisterError }}</div>
+        {{ end }}
+    </div>
+{{ end }}
+
+{{ define "intro" }}
+        <!-- Introduction Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4">ppacer Friends & Family Preview</h1>
+            <p class="text-lg">Join us for an exclusive preview of ppacer, a scheduler built in Go. This event is a special gathering for friends and family to experience the power of ppacer first-hand.</p>
+            <p class="text-lg">We look forward to your presence and feedback!</p>
+        </div>
+{{ end }}
+
+{{ define "header" }}
+<head>
+    <title>ppacer ff preview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/output.css">
+    <style>
+        .htmx-indicator {
+            opacity:0;
+            transition: opacity 500ms ease-in;
+        }
+    </style>
+    <script
+        src="https://unpkg.com/htmx.org@2.0.1"
+        integrity="sha384-QWGpdj554B4ETpJJC9z+ZHJcA/i59TyjxEPXiiUgN2WmTyV5OEZWCD6gQhgkdpB/"
+        crossorigin="anonymous"
+    ></script>
+</head>
+{{ end }}
+
