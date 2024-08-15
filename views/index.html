@@ -24,7 +24,7 @@
 
 {{ block "form" . }}
 <div class="p-8 rounded-lg shadow-md max-w-md mx-auto">
-    <form hx-post="/register" hx-target="#post-reg-notifications" hx-indicator="#form-loader">
+    <form id="registration-form" hx-post="/register" hx-target="#post-reg-notifications" hx-indicator="#form-loader">
         <div class="mb-4">
             <label for="nickname" class="block text-sm font-medium text-gray-700">Nickname (optional)</label>
             <input type="text" id="nickname" name="nickname" class="input input-bordered w-full mt-1" placeholder="Your nickname">
@@ -44,6 +44,12 @@
         </div>
     </form>
 </div>
+<script>
+    document.addEventListener("htmx:afterRequest", function(evt) {
+        // Reset the form after the request is completed
+        document.getElementById("registration-form").reset();
+    });
+</script>
 {{ end }}
 
 {{ block "notifications" . }}

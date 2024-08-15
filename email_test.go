@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestEmail(t *testing.T) {
-	secrets, awsErr := getSecretFromAWS()
+	secrets, awsErr := getEmailSecrets()
 	if awsErr != nil {
 		t.Errorf("Cannot get secrets from AWS: %s", awsErr.Error())
 	}

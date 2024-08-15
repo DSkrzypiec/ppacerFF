@@ -23,24 +23,26 @@ type page struct {
 }
 
 type Owner struct {
-	db      *SqliteDB
-	logger  *slog.Logger
-	tmpl    *templates
-	secrets emailSecret
+	db       *SqliteDB
+	logger   *slog.Logger
+	tmpl     *templates
+	secrets  emailSecret
+	telegram *Telegram
 }
 
 func NewOwner(db *SqliteDB, logger *slog.Logger, tmpl *templates) *Owner {
-	emailSecret, err := getSecretFromAWS()
+	emailSecret, err := getEmailSecrets()
 	if err != nil {
 		logger.Error("Cannot get email credentials from AWS", "err",
 			err.Error())
 		panic(err)
 	}
 	return &Owner{
-		db:      db,
-		logger:  logger,
-		tmpl:    tmpl,
-		secrets: emailSecret,
+		db:       db,
+		logger:   logger,
+		tmpl:     tmpl,
+		secrets:  emailSecret,
+		telegram: NewTelegram(),
 	}
 }
 
@@ -95,6 +97,10 @@ func (o *Owner) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	if iErr != nil {
 		o.logger.Error("Cannot insert new user", "user", user, "err",
 			iErr.Error())
+		o.telegram.Send(
+			fmt.Sprintf("[ppacerFF] Cannot insert new user [%s]: %s",
+				user.Email, iErr.Error()),
+		)
 	}
 	sendEmail(
 		email,
@@ -107,6 +113,10 @@ func (o *Owner) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	msg := fmt.Sprintf("Thank you for registering! Please check your inbox and confirm your email (%s).",
 		email)
 	p := page{PostRegisterInfo: msg}
+	o.telegram.Send(
+		fmt.Sprintf("[ppacerFF] New user registered: [%s] - %s", user.Email,
+			*user.Nickname),
+	)
 
 	renderErr := o.tmpl.Render(w, "notifications", p)
 	if renderErr != nil {
@@ -132,10 +142,18 @@ func (o *Owner) ConfirmHandler(w http.ResponseWriter, r *http.Request) {
 		email = userDb.Email
 		o.logger.Info("User confirmed", "email", userDb.Email, "hash",
 			userDb.Hash)
+		o.telegram.Send(
+			fmt.Sprintf("[ppacerFF] User [%s] confirmed their email",
+				userDb.Email),
+		)
 		iErr := ConfirmUser(o.db, userDb.Email, userDb.Hash)
 		if iErr != nil {
 			o.logger.Error("Error while confirming user", "email",
 				userDb.Email, "hash", userDb.Hash, "err", iErr.Error())
+			o.telegram.Send(
+				fmt.Sprintf("[ppacerFF] Error while confirim user [%s]: %s",
+					userDb.Email, iErr.Error()),
+			)
 		}
 	}
 

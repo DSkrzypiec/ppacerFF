@@ -1561,10 +1561,6 @@ html {
   display: inline-flex;
 }
 
-.hidden {
-  display: none;
-}
-
 .min-h-screen {
   min-height: 100vh;
 }

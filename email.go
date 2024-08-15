@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	from       = "info@dskrzypiec.dev"
-	secretName = "email/dskrzypiec/info"
+	awsRegion       = "eu-central-1"
+	from            = "info@dskrzypiec.dev"
+	emailSecretName = "email/dskrzypiec/info"
 )
 
 type emailSecret struct {
@@ -90,12 +91,17 @@ Content-Type: text/plain; charset="UTF-8"
 	return nil
 }
 
-func getSecretFromAWS() (emailSecret, error) {
+func getEmailSecrets() (emailSecret, error) {
+	return getSecretFromAWS[emailSecret](emailSecretName)
+}
+
+func getSecretFromAWS[T any](secretName string) (T, error) {
+	var secret T
 	cfg, err := config.LoadDefaultConfig(
-		context.TODO(), config.WithRegion("eu-central-1"),
+		context.TODO(), config.WithRegion(awsRegion),
 	)
 	if err != nil {
-		return emailSecret{}, err
+		return secret, err
 	}
 
 	svc := secretsmanager.NewFromConfig(cfg)
@@ -105,17 +111,16 @@ func getSecretFromAWS() (emailSecret, error) {
 
 	result, err := svc.GetSecretValue(context.TODO(), input)
 	if err != nil {
-		return emailSecret{}, fmt.Errorf("failed to retrieve secret: %w", err)
+		return secret, fmt.Errorf("failed to retrieve secret: %w", err)
 	}
 
 	if result.SecretString != nil {
-		var mySecret emailSecret
-		err = json.Unmarshal([]byte(*result.SecretString), &mySecret)
+		err = json.Unmarshal([]byte(*result.SecretString), &secret)
 		if err != nil {
-			return emailSecret{},
+			return secret,
 				fmt.Errorf("failed to unmarshal secret JSON: %v", err)
 		}
-		return mySecret, nil
+		return secret, nil
 	}
-	return emailSecret{}, fmt.Errorf("secret string is nil")
+	return secret, fmt.Errorf("secret string is nil")
 }
