@@ -28,6 +28,7 @@ type UserRow struct {
 	Nickname       *string
 	Hash           string
 	RegistrationTs string
+	Drinks         int
 	Confirmed      int
 	ConfirmationTs string
 }
@@ -88,13 +89,17 @@ func UserByHash(db *SqliteDB, hash string) (UserRow, error) {
 
 func InsertNewUser(db *SqliteDB, user User) error {
 	confirmed := 0
+	drinks := 0
 	if user.Confirmed {
 		confirmed = 1
+	}
+	if user.Drinks {
+		drinks = 1
 	}
 	_, iErr := db.Exec(
 		insertNewUserQuery(),
 		user.Email, user.Nickname, user.Hash, ToString(user.RegistrationTs),
-		confirmed, ToString(user.ConfirmationTs),
+		drinks, confirmed, ToString(user.ConfirmationTs),
 	)
 	if iErr != nil {
 		return iErr
@@ -122,8 +127,9 @@ func ConfirmUser(db *SqliteDB, email, hash string) error {
 func parseUserRow(rows *sql.Rows) (UserRow, error) {
 	var email, hash, regTs, confTs string
 	var nickname *string
-	var confirmed int
-	scanErr := rows.Scan(&email, &nickname, &hash, &regTs, &confirmed, &confTs)
+	var confirmed, drinks int
+	scanErr := rows.Scan(&email, &nickname, &hash, &regTs, &drinks,
+		&confirmed, &confTs)
 	if scanErr != nil {
 		return UserRow{}, scanErr
 	}
@@ -132,6 +138,7 @@ func parseUserRow(rows *sql.Rows) (UserRow, error) {
 		Nickname:       nickname,
 		Hash:           hash,
 		RegistrationTs: regTs,
+		Drinks:         drinks,
 		Confirmed:      confirmed,
 		ConfirmationTs: confTs,
 	}
@@ -145,6 +152,7 @@ func readUserByEmailQuery() string {
 		Nickname,
 		Hash,
 		RegistrationTs,
+		Drinks,
 		Confirmed,
 		ConfirmationTs
 	FROM
@@ -161,6 +169,7 @@ func readUserByHashQuery() string {
 		Nickname,
 		Hash,
 		RegistrationTs,
+		Drinks,
 		Confirmed,
 		ConfirmationTs
 	FROM
@@ -172,8 +181,8 @@ func readUserByHashQuery() string {
 
 func insertNewUserQuery() string {
 	return `
-	INSERT INTO users(Email, Nickname, Hash, RegistrationTs, Confirmed, ConfirmationTs)
-	VALUES (?,?,?,?,?,?)
+	INSERT INTO users(Email, Nickname, Hash, RegistrationTs, Drinks, Confirmed, ConfirmationTs)
+	VALUES (?,?,?,?,?,?,?)
 	`
 }
 
@@ -371,6 +380,7 @@ func sqliteCreateUserTable() string {
 			Nickname       TEXT NULL,
 			Hash           TEXT NOT NULL,
 			RegistrationTs TEXT NOT NULL,
+			Drinks         INT NOT NULL,
 			Confirmed      INT NOT NULL,
 			ConfirmationTs TEXT NOT NULL,
 

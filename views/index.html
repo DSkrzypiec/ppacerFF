@@ -9,6 +9,13 @@
 {{ block "body" . }}
     <body data-theme="sunset" class="min-h-screen bg-base-200">
         <div class="container mx-auto p-6">
+            <div class="flex justify-center mb-8">
+                <div class="max-w-md w-full">
+                    <a href="/">
+                        <img src="/assets/logo_ff.svg" alt="Logo" class="w-full h-auto">
+                    </a>
+                </div>
+            </div>
             {{ template "intro" }}
             {{ if .ShowForm }}
                 {{ template "form" . }}
@@ -26,17 +33,26 @@
 <div class="p-8 rounded-lg shadow-md max-w-md mx-auto">
     <form id="registration-form" hx-post="/register" hx-target="#post-reg-notifications" hx-indicator="#form-loader">
         <div class="mb-4">
-            <label for="nickname" class="block text-sm font-medium text-gray-700">Nickname (optional)</label>
+            <label for="nickname" class="block text-sm font-medium">Name/Nickname (optional)</label>
             <input type="text" id="nickname" name="nickname" class="input input-bordered w-full mt-1" placeholder="Your nickname">
         </div>
         <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <label for="email" class="block text-sm font-medium">Email</label>
             <input type="email" id="email" name="email" required class="input input-bordered w-full mt-1" placeholder="Your email address">
         </div>
         <div class="mb-4">
             <label class="inline-flex items-center">
+                <input type="checkbox" class="checkbox checkbox-primary" name="drinks">
+                <span class="ml-2">Count me in for drinks afterwards</span>
+            </label>
+        </div>
+        <div class="mb-4">
+            <label class="inline-flex items-center">
                 <input type="checkbox" class="checkbox checkbox-primary" required>
-                <span class="ml-2">I agree to the <a href="#" class="text-primary">GDPR terms and conditions</a></span>
+                <span class="ml-2">
+                    I consent to my data being collected and used for event
+                    registration as described in the
+                    <a href="/policy" class="link link-secondary">Privacy Policy</a>.
             </label>
         </div>
         <div>
@@ -65,17 +81,92 @@
 
 {{ define "intro" }}
         <!-- Introduction Section -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold mb-4">ppacer Friends & Family Preview</h1>
-            <p class="text-lg">Join us for an exclusive preview of ppacer, a scheduler built in Go. This event is a special gathering for friends and family to experience the power of ppacer first-hand.</p>
-            <p class="text-lg">We look forward to your presence and feedback!</p>
+        <div class="mb-8">
+            <div class="divider divider-secondary text-xl text-customOrange font-bold py-4">Event</div>
+
+            <p class="text-xl font-bold mb-4">You're Invited!</p>
+
+            <p class="text-lg mb-4">
+                I am thrilled to invite you to the first exclusive preview of
+
+                <span class="text-customOrange">
+                    <a href="https://ppacer.org">ppacer</a>
+                </span>
+
+                , a new DAG scheduler built in Go that I've been passionately
+                working on for the past 13 months. This special event is for
+                friends and family, and I'd love to show you what I've created.
+            </p>
+
+            <p class="text-xl font-bold mb-4">What to Expect:</p>
+            <ul class="list-disc list-inside text-lg px-8 mb-8">
+                <li>An introduction to what ppacer is and why I decided to build it</li>
+                <li>A live demo showcasing its capabilities</li>
+                <li>High-level plans for the road to version 1.0</li>
+            </ul>
+
+            <p class="text-xl font-bold mb-4">Event Details:</p>
+            <ul class="text-lg px-8 mb-8">
+                <li>
+                    <span class="text-customOrange font-bold">Where</span>:
+                    On-site in Warsaw
+                </li>
+                <li>
+                    <span class="text-customOrange font-bold">Date:</span>
+                    Tentatively October 23rd (final date to be confirmed soon)
+                </li>
+                <li>
+                    <span class="text-customOrange font-bold">Time:</span>
+                        5:00 PM - 7:00 PM
+                </li>
+                <li>
+                <span class="text-customOrange font-bold">Afterwards</span>:
+                    Join us for drinks and casual conversation at a nearby spot
+                </li>
+            </ul>
+
+            <p class="text-lg mb-4">
+                If that sounds interesting to you or you just want to catch up,
+                I'd love to have you there. Space is limited, so please register
+                soon to secure your spot. I'll keep you posted with updates both
+                here and via email.
+
+                Looking forward to seeing you and sharing this exciting
+                project!
+            </p>
+
+            <div class="divider divider-secondary text-xl text-customOrange font-bold py-8">Registration</div>
         </div>
 {{ end }}
 
+
+{{ block "policy" . }}
+<DOCTYPE html>
+<html lang="en">
+    {{ template "header" . }}
+    <body data-theme="sunset" class="min-h-screen bg-base-200">
+        <div class="container mx-auto p-6">
+            <div class="flex justify-center mb-8">
+                <div class="max-w-md w-full">
+                    <a href="/">
+                        <img src="/assets/logo_ff.svg" alt="Logo" class="w-full h-auto">
+                    </a>
+                </div>
+            </div>
+            <div class="divider divider-secondary text-xl text-customOrange font-bold py-4">
+                Privacy Policy
+            </div>
+        </div>
+    </body>
+</html>
+{{ end }}
+
+
 {{ define "header" }}
 <head>
-    <title>ppacer ff preview</title>
+    <title>ppacer ff</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/assets/favicon.png" sizes="32x32">
     <link rel="stylesheet" href="/css/output.css">
     <style>
         .htmx-indicator {

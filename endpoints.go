@@ -14,6 +14,7 @@ type User struct {
 	RegistrationTs time.Time
 	Confirmed      bool
 	ConfirmationTs time.Time
+	Drinks         bool
 }
 
 type page struct {
@@ -57,6 +58,8 @@ func (o *Owner) MainHandler(w http.ResponseWriter, r *http.Request) {
 func (o *Owner) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	nickname := r.FormValue("nickname")
+	drinks := r.FormValue("drinks")
+	drinksBool := drinks == "on"
 
 	userDb, uErr := UserByEmail(o.db, email)
 	exists := uErr != ErrUserNotFound
@@ -91,6 +94,7 @@ func (o *Owner) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 		Nickname:       &nickname,
 		Hash:           hash,
 		RegistrationTs: now,
+		Drinks:         drinksBool,
 		Confirmed:      false,
 	}
 	iErr := InsertNewUser(o.db, user)
@@ -175,5 +179,13 @@ func (o *Owner) ConfirmHandler(w http.ResponseWriter, r *http.Request) {
 	renderErr := o.tmpl.Render(w, "index", p)
 	if renderErr != nil {
 		o.logger.Error("Cannot render <index>", "err", renderErr.Error())
+	}
+}
+
+func (o *Owner) PolicyHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	renderErr := o.tmpl.Render(w, "policy", page{})
+	if renderErr != nil {
+		o.logger.Error("Cannot render <policy>", "err", renderErr.Error())
 	}
 }

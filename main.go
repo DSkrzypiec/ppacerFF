@@ -11,7 +11,7 @@ import (
 //go:embed views/*.html
 var viewsFS embed.FS
 
-//go:embed css/*
+//go:embed css/* assets/*
 var staticFS embed.FS
 
 func main() {
@@ -27,9 +27,11 @@ func main() {
 	owner := NewOwner(db, logger, templates)
 
 	mux.Handle("/css/", http.FileServer(http.FS(staticFS)))
+	mux.Handle("/assets/", http.FileServer(http.FS(staticFS)))
 	mux.HandleFunc("/", owner.MainHandler)
 	mux.HandleFunc("POST /register", owner.RegistrationHandler)
 	mux.HandleFunc("GET /confirm/{hash}", owner.ConfirmHandler)
+	mux.HandleFunc("/policy", owner.PolicyHandler)
 
 	const port = ":7272"
 	fmt.Println("Listening on port", port)
