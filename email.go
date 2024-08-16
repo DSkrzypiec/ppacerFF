@@ -35,8 +35,6 @@ Content-Type: text/plain; charset="UTF-8"
 %s
 	`, from, to, subject, body)
 
-	fmt.Println(message)
-
 	auth := smtp.PlainAuth("", from, secrets.Password, secrets.Host)
 	tlsconfig := &tls.Config{
 		InsecureSkipVerify: true,

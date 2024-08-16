@@ -55,6 +55,10 @@ func (o *Owner) MainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (o *Owner) HealthHandler(w http.ResponseWriter, _ *http.Request) {
+	fmt.Fprintf(w, "OK")
+}
+
 func (o *Owner) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	nickname := r.FormValue("nickname")
@@ -168,6 +172,19 @@ func (o *Owner) ConfirmHandler(w http.ResponseWriter, r *http.Request) {
 			PostRegisterInfo: fmt.Sprintf("Email [%s] has been confirmed. Thank you for registration!",
 				email),
 		}
+		sendEmail(
+			email,
+			"ppacer preview: friends&family - confirmation",
+			fmt.Sprintf(`Hello %s!
+
+Your participation in the event has been confirmed.
+Thank you for registering, and I can’t wait to meet you there!
+
+Best regards,
+Damian Skrzypiec
+	`, *userDb.Nickname),
+			o.secrets,
+		)
 	} else {
 		o.logger.Info("Hash not found", "email", email, "hash", confirmHash)
 		p = page{
